@@ -1,14 +1,5 @@
 const { Pool } = require("pg");
 
-// const pool = new Pool({
-//   user: process.env.DB_USER,
-//   host: process.env.DB_HOST,
-//   database: process.env.DB_NAME,
-//   password: process.env.DB_PASSWORD,
-
-//   port: process.env.DB_PORT,
-// });
-
 const pool = new Pool({
   user: "carlamissiona",
   host: "ep-round-moon-a1obo7oq-pooler.ap-southeast-1.aws.neon.tech",
@@ -21,6 +12,9 @@ const pool = new Pool({
 });
 
 //postgresql://carlamissiona:yhxjpBia4MA6@ep-round-moon-a1obo7oq-pooler.ap-southeast-1.aws.neon.tech/hvneon?sslmode=require
+ 
+
+
 
 // User CRUD Operations
 const createUserDB = async (userData) => {
@@ -687,8 +681,7 @@ console.log("++++++pushvdraftsinfo++++++");
   const query_prev = "Select *  from  nc_processed_content where plid = $1  ";
   //select nc.*, pl.*  from  nc_processed_content nc , nc_process_logs pl  where pl.id in (select id from nc_process_logs where processor ='process-a') and pl.status = 'DRAFT_START' and nc.plid in (select id from nc_process_logs where processor ='process-a') limit 1";
 
-  /** length_llm is about the checking of existing llm on the prev content so we dont need to update  */
-  let prev = null;
+  /** length_llm is about the checking of existing llm on the prev content so we dont need to update  */let prev = null;
   let length_llm = 0;
 
   try {
@@ -787,27 +780,38 @@ console.log("++++++pushvdraftsinfo++++++");
 
     // if process logs updated status and
     console.log("close the batch work here");
+
     return "Error in updating processor many llm ";
   }
 };
 
 
 const getSearchedfriends = async (data) => {
-  const { searched } = data;
-  let search = `'%"Name"%:%${searched}%'`;
 
-  // todo add another search for last name and firstname separately searched
-  const query = "SELECT * FROM nc_users WHERE nc_details_user ilike " + search;
+  
+}
 
-  try {
-    const result = await pool.query(query, []);
-
-    return result.rows;
-  } catch (error) {
-    console.log("error");
-    console.log(error);
-    throw new Error(`Error getting search results: ${error.message}`);
-  }
+const getVerificDr2= async (data) => {
+  const query = "Select nc.*, pl.* from nc_processed_content nc, nc_process_logs pl  where pl.id in (select id from nc_process_logs where processor ='process-a') and pl.status = 'DRAFT_VERIFY_2' and nc.plid in (select id from nc_process_logs where processor ='process-a') limit 1";
+  
+    try {
+      const result = await pool.query(query);
+      console.log(" @get DRAFTS result.rows[0].results ");
+  
+      if (result.rows.length > 0) {
+        console.log(result.rows[0].results_2);
+  
+        return result.rows;
+      } else {
+        // return null;
+        console.log("NONE 4 PROCESS_A ");
+        throw new Error(`Nothing to process for this processor`);
+      }
+    } catch (error) {
+      console.log("error get drafts");
+      console.log(error);
+      throw new Error(`Nothing to process for this processor`);
+    }
 };
 
 module.exports = {
@@ -828,5 +832,6 @@ module.exports = {
   getDrafts,
   pushDraftsinfo,
   getVerificDr,
+  getVerificDr2,
   pushVDraftsinfo,
 };
