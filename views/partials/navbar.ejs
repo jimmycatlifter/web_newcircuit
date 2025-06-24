@@ -1,0 +1,26 @@
+<header class="header">
+  <div class="container">
+    <nav class="navbar">
+      <a href="/" class="logo">
+        <i class="fas fa-shield-alt"></i>
+        <span>AuthApp</span>
+      </a>
+      
+      <button class="mobile-menu-btn" id="menuToggle" aria-label="Toggle menu">
+        <i class="fas fa-bars"></i>
+      </button>
+      
+      <ul class="nav-menu" id="navMenu">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <% if (locals.currentUser) { %>
+          <li><a href="/dashboard" class="nav-link">Dashboard</a></li>
+          <li><a href="/profile" class="nav-link">Profile</a></li>
+          <li><a href="/logout" class="nav-link logout-link">Logout</a></li>
+        <% } else { %>
+          <li><a href="/login" class="nav-link">Login</a></li>
+          <li><a href="/register" class="nav-link register-link">Register</a></li>
+        <% } %>
+      </ul>
+    </nav>
+  </div>
+</header>

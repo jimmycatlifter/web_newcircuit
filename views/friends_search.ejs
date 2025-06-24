@@ -1,0 +1,111 @@
+<%- include('partials/header') %>
+<!-- Breadcrumb Start -->
+<div x-data="{ pageName: `Search Discovery`}">
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <h2 class="text-xl font-semibold text-gray-800 dark:text-white/90" x-text="pageName"></h2>
+        <nav>
+            <ol class="flex items-center gap-1.5">
+                <li>
+                    <a class="inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400" href="index.html">
+                        <%= title %>
+                        <svg class="stroke-current" width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6.0765 12.667L10.2432 8.50033L6.0765 4.33366" stroke="" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </a>
+                </li>
+                <li class="text-sm text-gray-800 dark:text-white/90" x-text="pageName">
+                    <%= title%>
+                </li>
+            </ol>
+        </nav>
+    </div>
+</div>
+<!-- Breadcrumb End -->
+<!-- <div  class="min-h-screen rounded-2xl border border-gray-200 bg-white px-5 py-7 dark:border-gray-800 dark:bg-white/[0.03] xl:px-10 xl:py-12">
+    <div class="mx-auto w-full max-w-[630px] text-center">
+    
+    
+                
+         
+    
+    
+        
+    </div>
+    </div> -->
+<!-- Page  Mainbox Start -->
+<div class="rounded-2xlx border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] xl:w-4/5">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-800">
+        <button class="flex items-center justify-center gap-2 px-4 py-3 text-sm font-md text-white rounded-md bg-brand-500 shadow-theme-xs hover:bg-brand-600">
+            <svg class="fill-current" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M6.99578 4.08398C6.58156 4.08398 6.24578 4.41977 6.24578 4.83398V6.36733H13.7542V5.62451C13.7542 5.42154 13.672 5.22724 13.5262 5.08598L12.7107 4.29545C12.5707 4.15983 12.3835 4.08398 12.1887 4.08398H6.99578ZM15.2542 6.36902V5.62451C15.2542 5.01561 15.0074 4.43271 14.5702 4.00891L13.7547 3.21839C13.3349 2.81151 12.7733 2.58398 12.1887 2.58398H6.99578C5.75314 2.58398 4.74578 3.59134 4.74578 4.83398V6.36902C3.54391 6.41522 2.58374 7.40415 2.58374 8.61733V11.3827C2.58374 12.5959 3.54382 13.5848 4.74561 13.631V15.1665C4.74561 16.4091 5.75297 17.4165 6.99561 17.4165H13.0041C14.2467 17.4165 15.2541 16.4091 15.2541 15.1665V13.6311C16.456 13.585 17.4163 12.596 17.4163 11.3827V8.61733C17.4163 7.40414 16.4561 6.41521 15.2542 6.36902ZM4.74561 11.6217V12.1276C4.37292 12.084 4.08374 11.7671 4.08374 11.3827V8.61733C4.08374 8.20312 4.41953 7.86733 4.83374 7.86733H15.1663C15.5805 7.86733 15.9163 8.20312 15.9163 8.61733V11.3827C15.9163 11.7673 15.6269 12.0842 15.2541 12.1277V11.6217C15.2541 11.2075 14.9183 10.8717 14.5041 10.8717H5.49561C5.08139 10.8717 4.74561 11.2075 4.74561 11.6217ZM6.24561 12.3717V15.1665C6.24561 15.5807 6.58139 15.9165 6.99561 15.9165H13.0041C13.4183 15.9165 13.7541 15.5807 13.7541 15.1665V12.3717H6.24561Z" fill="" />
+            </svg>
+            View Your Profiles
+        </button>
+        <!--Images-chat-->
+        <div class="flex -space-x-2">
+            <div class="w-6 h-6 overflow-hidden border-2 border-white rounded-full dark:border-gray-900">
+                <img src="template_tails/src/images/user/user-22.jpg" alt="user" />
+            </div>
+            <div class="w-6 h-6 overflow-hidden border-2 border-white rounded-full dark:border-gray-900">
+                <img src="template_tails/src/images/user/user-23.jpg" alt="user" />
+            </div>
+            <div class="w-6 h-6 overflow-hidden border-2 border-white rounded-full dark:border-gray-900">
+                <img src="template_tails/src/images/user/user-24.jpg" alt="user" />
+            </div>
+        </div>
+        <!--End Images-chat-->
+    </div>
+    <div class="flex items-right" style="width: 100%; min-width: 100%">
+        <!--Col-Left--->
+        <div class="rounded-2xlx border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6" style="min-width: 96% !important">
+            <h3 class="mb-5 text-lg font-semibold text-gray-800 dark:text-white/90 lg:mb-7">
+                Add Connection
+            </h3>
+
+            <div class="p-5 mb-6 dark:border-gray-800 lg:p-6">
+                <div class="flex gap-2 xl:flex-row xl:items-center xl:justify-between">
+                    <div class="flex items-center w-full gap-6">
+                        <div class="w-20 h-20 overflow-hidden border border-gray-200 rounded-full dark:border-gray-800">
+                            <img src="src/images/user/owner.jpg" alt="user" />
+                        </div>
+                        <div class="order-3 xl:order-2">
+                            <h4 class="mb-2 text-lg font-semibold text-center text-gray-800 dark:text-white/90 xl:text-left">
+                                Musharof Chowdhury
+                            </h4>
+                            <div class="flex flex-col items-center gap-1 text-center xl:flex-row xl:gap-3 xl:text-left">
+
+                                <p class="text-sm text-gray-500 dark:text-gray-400">
+                                    Team Manager
+                                </p>
+                                <div class="hidden h-3.5 w-px bg-gray-300 dark:bg-gray-700 xl:block">
+                                </div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">
+                                    Arizona, United States.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-center order-2 gap-2 grow xl:order-3 xl:justify-end"></div>
+                    </div>
+                    <form action="/friends/add" method="POST">
+                        <input type="hidden" name="fremail" value="mail@mail.com" />
+                        <button type="submit" class="flex w-full items-center justify-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200 lg:inline-flex lg:w-auto">
+                            <svg class="fill-current" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M15.0911 2.78206C14.2125 1.90338 12.7878 1.90338 11.9092 2.78206L4.57524 10.116C4.26682 10.4244 4.0547 10.8158 3.96468 11.2426L3.31231 14.3352C3.25997 14.5833 3.33653 14.841 3.51583 15.0203C3.69512 15.1996 3.95286 15.2761 4.20096 15.2238L7.29355 14.5714C7.72031 14.4814 8.11172 14.2693 8.42013 13.9609L15.7541 6.62695C16.6327 5.74827 16.6327 4.32365 15.7541 3.44497L15.0911 2.78206ZM12.9698 3.84272C13.2627 3.54982 13.7376 3.54982 14.0305 3.84272L14.6934 4.50563C14.9863 4.79852 14.9863 5.2734 14.6934 5.56629L14.044 6.21573L12.3204 4.49215L12.9698 3.84272ZM11.2597 5.55281L5.6359 11.1766C5.53309 11.2794 5.46238 11.4099 5.43238 11.5522L5.01758 13.5185L6.98394 13.1037C7.1262 13.0737 7.25666 13.003 7.35947 12.9002L12.9833 7.27639L11.2597 5.55281Z" fill="" />
+                            </svg>
+                            Subscribe!
+                        </button>
+                    </form>
+                </div>
+
+                <br />
+
+
+            </div><!--End wrapper list below ending div -->
+        </div>
+        <!---Col Discovery Col 1 Left --->
+    </div>
+</div>
+
+<br /><br />
+<!-- Page Mainbox End -->
+<%- include('partials/footer') %>

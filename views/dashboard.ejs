@@ -1,0 +1,108 @@
+<%- include('partials/header') %>
+<%- include('partials/navbar') %>
+
+<main class="main">
+  <section class="dashboard-section">
+    <div class="container">
+      <div class="dashboard-header">
+        <h1 class="dashboard-title">Dashboard</h1>
+        <p class="welcome-message">Welcome back, <%= user.name %>!</p>
+      </div>
+      
+      <div class="dashboard-stats">
+        <div class="stat-card">
+          <div class="stat-icon"><i class="fas fa-project-diagram"></i></div>
+          <div class="stat-content">
+            <h3 class="stat-value"><%= data.stats.projects %></h3>
+            <p class="stat-label">Projects</p>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon"><i class="fas fa-tasks"></i></div>
+          <div class="stat-content">
+            <h3 class="stat-value"><%= data.stats.tasks %></h3>
+            <p class="stat-label">Tasks</p>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+          <div class="stat-content">
+            <h3 class="stat-value"><%= data.stats.completed %></h3>
+            <p class="stat-label">Completed</p>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon"><i class="fas fa-clock"></i></div>
+          <div class="stat-content">
+            <h3 class="stat-value"><%= data.stats.pending %></h3>
+            <p class="stat-label">Pending</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="dashboard-content">
+        <div class="dashboard-card">
+          <div class="card-header">
+            <h2>Recent Activity</h2>
+          </div>
+          <div class="card-body">
+            <ul class="activity-list">
+              <% data.recentActivity.forEach(activity => { %>
+                <li class="activity-item">
+                  <div class="activity-icon">
+                    <% if (activity.action.includes('Completed')) { %>
+                      <i class="fas fa-check-circle text-success"></i>
+                    <% } else if (activity.action.includes('Added')) { %>
+                      <i class="fas fa-plus-circle text-primary"></i>
+                    <% } else if (activity.action.includes('Updated')) { %>
+                      <i class="fas fa-edit text-warning"></i>
+                    <% } else { %>
+                      <i class="fas fa-arrow-right text-info"></i>
+                    <% } %>
+                  </div>
+                  <div class="activity-content">
+                    <p class="activity-text">
+                      <strong><%= activity.action %></strong>: <%= activity.item %>
+                    </p>
+                    <p class="activity-time"><%= activity.time %></p>
+                  </div>
+                </li>
+              <% }) %>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="dashboard-card">
+          <div class="card-header">
+            <h2>Quick Actions</h2>
+          </div>
+          <div class="card-body">
+            <div class="quick-actions">
+              <a href="#" class="action-button">
+                <i class="fas fa-plus"></i>
+                <span>New Project</span>
+              </a>
+              <a href="#" class="action-button">
+                <i class="fas fa-clipboard-list"></i>
+                <span>Add Task</span>
+              </a>
+              <a href="#" class="action-button">
+                <i class="fas fa-calendar"></i>
+                <span>Schedule</span>
+              </a>
+              <a href="#" class="action-button">
+                <i class="fas fa-file-export"></i>
+                <span>Export</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<%- include('partials/footer') %>
