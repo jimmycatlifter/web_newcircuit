@@ -1,0 +1,60 @@
+<%- include('../partials/header_a') %>
+<%- include('../partials/navbar') %>
+
+<main class="main">
+  <section class="auth-section">
+    <div class="container">
+      <div class="auth-container">
+        <div class="auth-form-container">
+          <h1 class="auth-title">Login</h1>
+          <p class="auth-subtitle">Welcome back! Please login to your account</p>
+          
+          <%- include('../partials/alert') %>
+          
+          <form class="auth-form" action="/login" method="POST">
+            <div class="form-group">
+              <label for="email">Email</label>
+              <div class="input-with-icon">
+                <i class="fas fa-envelope"></i>
+                <input 
+                  type="email" 
+                  id="email" 
+                  name="email" 
+                  placeholder="Enter your email"
+                  value="<%= locals.email  || '' %>"
+                  required
+                >
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="password">Password</label>
+              <div class="input-with-icon">
+                <i class="fas fa-lock"></i>
+                <input 
+                  type="password" 
+                  id="password" 
+                  name="password" 
+                  placeholder="Enter your password"
+                  required
+                >
+              </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block">Login</button>
+          </form>
+          
+          <div class="auth-links">
+            <p>Don't have an account? <a href="/register">Register</a></p>
+          </div>
+        </div>
+        
+        <div class="auth-image">
+          <img src="https://images.pexels.com/photos/8728560/pexels-photo-8728560.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="Login">
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<%- include('../partials/footer') %>
