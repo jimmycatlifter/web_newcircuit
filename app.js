@@ -630,15 +630,18 @@ app.get("/draftsverif_db2", async (req, res) => {
                 "2025v New Circuit Model: klusterai/Meta-Llama-3.1-8B-Instruct-Turbo",
             )[1];
 
-            if (par3_tx.indexOf("Supporting Info :") > -1) {
-                let res = par3_tx.replace("Supporting Info :", "Info From Mistral: ");
-                par3_tx = res;
-                console.log("----par3_text------");
-                console.log("----par3_text------");
-                console.log("----par3_text------");
-                console.log(par3_tx);
-            }
+            if ( par3_tx.indexOf("Verifier : No") > -1 ){
+                   console.log(
+                       
+                       
+                       "!!!!par3_tx = pargraph 1 == substring '2. Cited'");                     console.log("!!!!par3_tx = pargraph 1 == substring '2. Cited'");  
+                console.log( (par3_tx.split("Verifier : No")[1]).length  );                console.log( (par3_tx.split("Verifier : No")[0]).length  );
 
+console.log( "par3_tx ????????????????????????[console.log( ????????????????????????");
+
+            console.log("///////////////// Console.log Verifier has has has  No ");                  
+                   }
+        
             const scout = results_2.split(
                 "2025v New Circuit Model: mistralai/Mistral-Small-24B-Instruct-2501",
             )[1];
@@ -649,25 +652,17 @@ app.get("/draftsverif_db2", async (req, res) => {
                && scout.indexOf("Mistral-Small-24B Supporting Info:") > -1){
 
                 // good 
-
-
-                
-            }
-            let par2_tx = null;
-            if (index !== -1) {
-                par2_tx = scout.slice(0, index); // Cut string from 0 to the occurrence of the substring
-                console.log("substring substring par2_tx==========");
-
-                console.log(par2_tx);
-                if (par2_tx.indexOf("Supporting Info :") > -1) {
-                    res = par2_tx.replace("Supporting Info :", "Info From Llama-Scout: ");
-                    par2_tx = res;
-                    console.log("----par2_text------");
-                    console.log("----par2_text------");
-                    console.log("----par2_text------");
-                    console.log(par2_tx);
-                }
-            }
+               if (scout.indexOf("Verifier: No") > -1 ){
+ 
+ console.log("////////////////// Console.log Verifier No ");                  
+               } else {
+             
+                   par2_tx = scout; 
+                   par2_tx = par2_tx.substring(0, par2_tx.indexOf("2025v New Circuit Model: klusterai/Meta-Llama-3.1-8B-Instruct-Turbo")) ; 
+                   console.log("par 2 tx ///////////// ok ok ", par2_tx);
+              }
+              
+         }
 
 
             let par1_tx = null;
@@ -675,23 +670,31 @@ app.get("/draftsverif_db2", async (req, res) => {
             const trbo = results_2.split(
                 "2025v New Circuit Model: meta-llama/Llama-4-Scout-17B-16E-Instruct",
             )[1];
-            index = trbo.indexOf(
-                "2025v New Circuit Model: meta-llama/Llama-4-Scout-17B-16E-Instruct",
-            );
-            if (index !== -1) {
-                par1_tx = trbo.slice(0, index); // Cut string from 0 to the occurrence of the substring 
-                console.log("substring substrung substring", par1_tx);
-                if (par1_tx.indexOf("Supporting Info :") > -1) {
-                    let res = par1_tx.replace("Supporting Info :", "Info From Llama 8B: ");
 
-                }
 
-                par1_tx = res;
-                console.log("----par1_text------");
-                console.log("----par1_text------");
-                console.log("----par1_text------");
-                console.log(par1_tx);
-            }
+                        if(trbo.indexOf("Llama-4-Scout-17B Supporting Info") > -1 
+                           && trbo.indexOf("Llama-3.1-8B Supporting Info") > -1){
+
+                            // good 
+                           if (trbo.indexOf("Verifier: No") > -1 ){
+                           console.log("!!!!trb = pargraph 1 == substring '2. Cited'",   trbo.substring( trbo.indexOf("Verifier : No"), trbo.indexOf("2. Cited") ) );
+             console.log("////////////////// Console.log Verifier has has has  No ");                  
+                           } else {
+
+                               par1_tx = trbo; 
+                               console.log("par 111 tx ///////////// ok ok ", par1_tx);
+                               par1_tx = par1_tx.substring(0, par1_tx.indexOf("2025v New Circuit Model: mistralai/Mistral-Small-24B-Instruct-2501")) ; 
+                                  console.log("par 1 tx ///////////// ok ok ");                                  console.log("par 1 tx ///////////// ok ok ", par1_tx);
+
+                           }
+
+
+                        }
+
+
+
+
+            
             console.log("SPLIIIIIIIIIT?????????????");
             console.log("SPLIIIIIIIIIT?????????????");
             // console.log(trbo_tx);
@@ -710,7 +713,7 @@ app.get("/draftsverif_db2", async (req, res) => {
 
 console.log("par b4 klp3 ++++++++");console.log("par b4 klp3 ++++++++");
             console.log("par b4 klp3 ++++++++");
-console.log(plid," < PLID par_1==================", par1_tx); console.log(plid, " << PLID par_2===============", par2_tx); console.log(.//plid , " <<PLID par_3=============", par3_tx);
+console.log(plid," < PLID par_1==================", par1_tx); console.log(plid, " << PLID par_2===============", par2_tx); console.log(plid , " <<PLID par_3=============", par3_tx);
 /** 
 
             let kl_llm0 = await fetch_klp3(
