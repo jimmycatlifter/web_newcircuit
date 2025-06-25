@@ -15,7 +15,8 @@ const readRoutes = require("./routes/readRoutes");
 const {
     getDrafts,
     pushDraftsinfo,
-     getVerificDr2,
+    getVerificDr2,
+    pushV2Draftsinfo,
     getVerificDr,
     pushVDraftsinfo,
 } = require("./db");
@@ -27,6 +28,18 @@ const apiKey = "b96b0973-fa7c-4e93-82ba-8d253e3938c7";
 
 async function fetch_kly1(idarticle, paragraph_art, modelname) {
     let returned_result = "";
+
+    let model = "";
+    if (modelname.indexOf('Mistral') > -1) {
+        model = "Mistral-Small-24B"
+    }
+
+    if (modelname.indexOf('Turbo') > -1) {
+        model = "Llama-3.1-8B";
+    }
+    if (modelname.indexOf('Scout') > -1) {
+        model = "Llama-4-Scout-17B";
+    }
     const response = await fetch("https://api.kluster.ai/v1/chat/completions", {
             method: "POST",
             headers: {
@@ -37,7 +50,7 @@ async function fetch_kly1(idarticle, paragraph_art, modelname) {
                 model: modelname,
                 messages: [{
                         role: "system",
-                        content: "Play a role of a machine-like system giving exact answers and not being conversational. Do not try to answer like Explainable AIs. You are given a paragraph and you must take 4 citations (sentences) and minimum of 2 citation sentences which you know can't be a misinformation based on context of the paragraph. You must also support this sentence from your own knowledge (Max 2 sentences). You are like a web misinformation machine you don't have to explain your logic. Output with this format: first you must number the sentence cited from the paragraph, then add supporting info under the numbering of the cite; add delimiter 5 asterisks after supporting info , dont add asterisk on your chosen citation to make it bold. This is the format: \n1. Cited: [Cited Sentence] \n Supporting Info : [ Your training data, definition etc ] \n2. Cited: [Cited Sentence] \n Supporting Info :   ..etc.",
+                        content: `Play a role of a machine-like system giving exact answers and not being conversational. Do not try to answer like Explainable AIs. You are given a paragraph and you must take 4 citations (sentences) and minimum of 2 citation sentences which you know can't be a misinformation based on context of the paragraph. You must also support this sentence from your own knowledge (Max 2 sentences). You are like a web misinformation machine you don't have to explain your logic. Output with this format: first you must  add a number then the sentence cited from the paragraph, then add supporting info under the numbering of the cited. Dont add asterisk on your output to make it bold. This is the format: \n1. Cited: [Cited Sentence] \n ${model} Supporting Info : [ Your training data, definition etc ] \n2. Cited: [Cited Sentence] \n ${model} Supporting Info :   ..etc.`,
                     },
                     {
                         role: "user",
@@ -110,27 +123,24 @@ async function fetch_kly1(idarticle, paragraph_art, modelname) {
         });
 }
 
-async function fetch_klp3(plid, content_draft, modelname, prevmodel) {
+async function fetch_klp3(plid, content_draft, modelname, prevmodel, prevmodel2) {
 
 
-    console.log("+++++content_draft klp3 klp3+++++");
-console.log(content_draft);
+    console.log("+++content_draft klp3 klp3+++");
+    console.log(content_draft);
     let returned_result = "";
-let model = "";
-    if( modelname.indexOf('Mistral') > -1 ){
-
-        model = "Mistral-Small-24B" }
-
-    if( modelname.indexOf('Turbo') > -1 ){
-
+    let model = "";
+    if (modelname.indexOf('Mistral') > -1) {
+        model = "Mistral-Small-24B"
+    }
+    if (modelname.indexOf('Turbo') > -1) {
         model = "Llama-3.1-8B";
     }
-    if( modelname.indexOf('Scout') > -1 ){
-
+    if (modelname.indexOf('Scout') > -1) {
         model = "Llama-4-Scout-17B";
     }
-    
-    let content_d = `You are a system giving exact answers and not being conversational. Don't explain your thoughts like Explainable AI. You are given a paragraph (with Cited & Supporting Info) and you must verify the truthfulness of each cited and its supporting info using your own knowledge. If you agree that the cited info (labeled as Cited) is true and the supporting info ( labeled as Info from ${prevmodel} ) is also true and really relates to the Cited statement and gives evidence to its truthfulness based on real world facts, put Yes to Verifier field, if not put No. Then put an Info label and  add your own knowledge that must also give evidence to the Cited but must be similar in meaning with that supporting info (from the input). Limit your answers to 1-2 short sentences. To output properly copy the cited & model supporting info from the input, then add a label info which has your own knowledge Instruction for output. First put number then add the label Cited which will have the cited statement from input then add the label Verifier this value is Yes or No. Then copy info from model, its label and value. Finally add Info from ${model} label where you add your own knowledge. If you answered No to Verifier, then put nothing else on the number (but the cited and the Verifier: No). Output format: 1. Cited : [ Just copy the the same value from input ] \n Verifier : [Yes/No] \n Info From ${prevmodel} : [ Copy from input ] \n Info from ${model} : [ Your training data, knowledge  ] \n 2. Cited : [ Just copy the the same value from input ] \n Verifier: [Yes/No] \n Info From ${prevmodel} : [ Copy from input ] \nInfo from ${model} : [ Your training data, knowledge  ]`;
+
+    let content_d = `You are a system giving exact answers and not being chatty. You must fact-check the given  cited and other infos.There are 2 supporting infos from different model from input, verify these too. Don't explain your thoughts like Explainable AI. You are given a paragraph (with Cited & Supporting Infos) and you must verify the truthfulness of each cited and its supporting info using your own knowledge. If you agree that the cited info (labeled as Cited) is true and the supporting info (labeled as ${prevmodel } Supporting Info) is also true and really gives evidence to its truthfulness based on real world facts, put Yes to Verifier field, if not put No. Then put a '${model} Supporting Info' label and add your own knowledge that must also give evidence to the Cited but must be similar in meaning with the given supporting infos. All supporting infos must be similar in meaning. Limit your answers to 1-2 short sentences. Move to next number. If you answered No to Verifier, then put nothing else on the number (but the cited and the Verifier: No). Output instructions: Put a number, then copy cited statement. Add a verifier label then add your answer to it. Then copy all the supporting infos from input. Finally add your own supporting info, follow the output format. Output format: 1. Cited : [ Copy from input ] \n Verifier : [ Yes / No ] \n ${prevmodel} Supporting Info: [ Copy input ]\n ${prevmodel2} Supporting Info: [ Copy input ]\n ${model} Supporting Info : [ Supporting Info from training data, your knowledge ] 2.. 3.. etc.. `;
 
     const response = await fetch("https://api.kluster.ai/v1/chat/completions", {
             method: "POST",
@@ -142,7 +152,7 @@ let model = "";
                 model: modelname,
                 messages: [{
                         role: "system",
-                        content:  content_d,
+                        content: content_d,
                     },
                     {
                         role: "user",
@@ -174,24 +184,23 @@ let model = "";
                             returned_result = result;
 
                             console.log(
-                                "Res3 res3 res3:: mistral result3 =================returned_result-==============",
+                                "Res3 res3 res3:: mistral result3 ===========returned_result======",
                             );
                             // console.log(returned_result);
                             // const content_txt = filtertx(JSON.parse(result).choices[0].message.content);
                             console.log(JSON.parse(result).choices[0].message.content);
-                            // const data = {
-                            //     plid: plid,
-                            //     model: modelname,
-                            //     content: JSON.parse(result).choices[0].message.content,
-                            // };
+                            const data = {
+                                plid: plid,
+                                model: modelname,
+                                content: JSON.parse(result).choices[0].message.content,
+                            };
 
-                            // const posting = await pushVDraftsinfo(data)
-                            //     .then(async (vl) => {
-                            //         console.log("++++++++++++++end pushDraftsinfo vl should be  true++++++++++");
-
-                            //         console.log(vl);
-                            //     })
-                            //     .catch(console.error);
+                            const posting = await pushV2Draftsinfo(data)
+                                .then(async (vl) => {
+                                    console.log("+++++++end pushDraftsinfo vl should be true+++++");
+                                    console.log(vl);
+                                })
+                                .catch(console.error);
 
                             return result; // full response text
                         }
@@ -227,23 +236,22 @@ let model = "";
     return await response;
 }
 
-async function fetch_klp2(plid, content_draft, modelname) {
+async function fetch_klp2(plid, content_draft, modelname, prevmodel) {
     let returned_result = "";
-let model = "";
-    if( modelname.indexOf('Mistral') > -1 ){
-
-        model = "Mistral-Small-24B" }
-
-    if( modelname.indexOf('Turbo') > -1 ){
-
+    let model = "";
+    if (modelname.indexOf('Mistral') > -1) {
+        model = "Mistral-Small-24B"
+    }
+    if (modelname.indexOf('Turbo') > -1) {
         model = "Llama-3.1-8B";
     }
-    if( modelname.indexOf('Scout') > -1 ){
-
+    if (modelname.indexOf('Scout') > -1) {
         model = "Llama-4-Scout-17B";
     }
 
-    let content_d = `You are a system giving exact answers and not being conversational. Don't explain your thoughts like Explainable AI. You are given a paragraph (with Cited & Supporting Info) and you must verify the truthfulness of each cited and its supporting info using your own knowledge. If you agree that the cited info (labeled as Cited) is true and the supporting info (labeled as Info from Specific-Model ) is also true and really relates to the Cited statement and gives evidence to its truthfulness based on real world facts, put Yes to Verifier field, if not put No. Then put a Supporting Info label and  add your own knowledge that must also give evidence to the Cited but must be similar in meaning with that supporting info (from the input). Limit your answers to 1-2 short sentences. To output properly copy the cited & model  info from the input, then add a label supporting info which has your own knowledge. Move to next number in the input and do the same. Instruction for output. First put number then add the label Cited which will have the cited statement from input then add the label Verifier this value is Yes or No. Then copy info from model, its label and value. Finally add Supporting Info label where you add your own knowledge. If you answered No to Verifier, then put nothing else on the number (but the cited and the Verifier: No). Output format: 1. Cited : [ Just copy the the same value from input ] \n Verifier : [Yes/No] \n Info From ${model} : [ Copy from input ] \n Supporting Info : [ Your training data, knowledge  ] \n 2. Cited : [ Just copy the the same value from input ] \n Verifier: [Yes/No] \n Info From ${model} : [ Copy from input ] Supporting Info : [ Your training data, knowledge  ]`;
+     console.log("+++prevmodel+++++");
+    // console.log();
+    let content_d = `You are a system giving exact answers and not being chatty. You must fact-check the given  cited and other infos. Don't explain your thoughts like Explainable AI. You are given a paragraph (with Cited & Supporting Infos) and you must verify the truthfulness of each cited and its supporting info using your own knowledge. If you agree that the cited info (labeled as Cited) is true and the supporting info (labeled as ${prevmodel } Supporting Info) is also true and really gives evidence to its truthfulness based on real world facts, put Yes to Verifier field, if not put No. Then put a '${model} Supporting Info' label and add your own knowledge that must also give evidence to the Cited but must be similar in meaning with the given supporting infos. All supporting infos must be similar in meaning. Limit your answers to 1-2 short sentences. Move to next number in the input and do the same. If you answered No to Verifier, then put nothing else on the number (but the cited and the Verifier: No). Output format: 1. Cited : [ Copy from input ] \n Verifier : [Yes/No] \n ${prevmodel} Supporting Info: [ Copy input ]\n ${model} Supporting Info : [ Supporting Info from training data, your knowledge ] 2.. 3.. etc..`;
 
     const response = await fetch("https://api.kluster.ai/v1/chat/completions", {
             method: "POST",
@@ -255,7 +263,7 @@ let model = "";
                 model: modelname,
                 messages: [{
                         role: "system",
-                        content:  content_d,
+                        content: content_d,
                     },
                     {
                         role: "user",
@@ -301,7 +309,6 @@ let model = "";
                             const posting = await pushVDraftsinfo(data)
                                 .then(async (vl) => {
                                     console.log("++++++++++++++end pushDraftsinfo vl should be  true++++++++++");
-
                                     console.log(vl);
                                 })
                                 .catch(console.error);
@@ -343,8 +350,6 @@ let model = "";
 
 
 
-
-
 //Kluster AI
 
 // View engine
@@ -382,13 +387,16 @@ app.get("/", (req, res) => {
 });
 
 app.get("/drafts_db", async (req, res) => {
-    let user = null;
-    /** settimeout 3mins and search for plid if the plid on content has all models in string then update status DRAFT_verify then end func */
 
-    let chk_db_artcl = null;
+    const process_name = req.query.process_name;
+    let user = null; 
+     if (!process_name) {
+        return res.status(400).json({ error: "Missing 'process name' query parameter" });
+      }
+
     try {
         console.log("getDrafts ==========================");
-        const postingblog = await getDrafts().then(async (vl) => {
+        const drafts = await getDrafts({ process_name }).then(async (vl) => {
             // get variables
 
             let {
@@ -451,6 +459,7 @@ app.get("/drafts_db", async (req, res) => {
                     art_prgph_3,
                     "mistralai/Mistral-Small-24B-Instruct-2501",
                 )
+//// 
                 .then((v) => {
                     console.log(v);
                 })
@@ -462,35 +471,43 @@ app.get("/drafts_db", async (req, res) => {
         console.log("Error!! Nothing to process @ drafts_db @app.js ", error);
     }
 });
-
 // verify drafts db
 
 app.get("/draftsverif_db", async (req, res) => {
-    let user = null;
-    /** settimeout 3mins and search for plid if the plid on content has all models in string then update status DRAFT_verify then end func */
 
-    let chk_db_artcl = null;
+    const process_name = req.query.process_name;
+    let user = null;    let chk_db_artcl = null;
     try {
+        
         console.log("getDrafts ==========================");
-        const verifying = await getVerificDr().then( async (vl) => {
+        const verifying = await getVerificDr({ process_name }).then(async (vl) => {
             // get variables
 
             let {
-                plid,  content,   id, results, processor,          articleid
+                plid,
+                content,
+                id,
+                results,
+                processor,
+                articleid
             } = vl[0];
 
             let index = null;
             let par3_tx = results.split(
                 "2025v New Circuit Model: mistralai/Mistral-Small-24B-Instruct-2501",
             )[1];
-            if (par3_tx.indexOf("Supporting Info :") > -1) {
-                let res = par3_tx.replace("Supporting Info :", "Info From Mistral: ");
-                par3_tx = res;
-                console.log("----par3_text------");
-                console.log("----par3_text------");
-                console.log("----par3_text------");
-                console.log(par3_tx);
-            }
+            // if (par3_tx.indexOf("Supporting Info :") > -1) {
+            //     let res = par3_tx.replace("Supporting Info :", "Info From Mistral: ");
+            //     par3_tx = res;
+            //     console.log("----par3_text------");
+
+            
+            
+            
+            
+            //     console.log("----par3_text------"); 
+            //     console.log(par3_tx);
+            // }
 
             const scout = results.split(
                 "2025v New Circuit Model: meta-llama/Llama-4-Scout-17B-16E-Instruct",
@@ -503,14 +520,14 @@ app.get("/draftsverif_db", async (req, res) => {
                 par2_tx = scout.slice(0, index); // Cut string from 0 to the occurrence of the substring
             }
 
-            if (par2_tx.indexOf("Supporting Info :") > -1) {
-                let res = par2_tx.replace("Supporting Info :", "Info From Llama-Scout: ");
-                par2_tx = res;
-                console.log("----par2_text------");
-                console.log("----par2_text------");
-                console.log("----par2_text------");
-                console.log(par2_tx);
-            }
+            // if (par2_tx.indexOf("Supporting Info :") > -1) {
+            //     let res = par2_tx.replace("Supporting Info :", "Info From Llama-Scout: ");
+            //     par2_tx = res;
+            //     console.log("----par2_text------");
+            //     console.log("----par2_text------");
+            //     console.log("----par2_text------");
+            //     console.log(par2_tx);
+            // }
             let par1_tx = null;
 
             const trbo = results.split(
@@ -520,17 +537,15 @@ app.get("/draftsverif_db", async (req, res) => {
                 "2025v New Circuit Model: meta-llama/Llama-4-Scout-17B-16E-Instruct",
             );
             if (index !== -1) {
-                par1_tx = trbo.slice(0, index); // Cut string from 0 to the occurrence of the substring
+                par1_tx = trbo.slice(0, index); // Cut string from 0 to the occurrence of the substring 
             }
-
-            if (par1_tx.indexOf("Supporting Info :") > -1) {
-                let res = par1_tx.replace("Supporting Info :", "Info From Llama 8B: ");
-                par1_tx = res;
-                console.log("----par1_text------");
-                console.log("----par1_text------");
-                console.log("----par1_text------");
-                console.log(par1_tx);
-            }
+                // if (par1_tx.indexOf("Supporting Info :") > -1) {
+            //     let res = par1_tx.replace("Supporting Info :", "Info From Llama 8B: ");
+            //     par1_tx = res;
+            //     console.log("----par1_text------");  
+            //     console.log("----par1_text------");
+            //     console.log(par1_tx);
+            // }
             console.log("SPLIIIIIIIIIT?????????????");
             console.log("SPLIIIIIIIIIT?????????????");
             // console.log(trbo_tx);
@@ -550,20 +565,17 @@ app.get("/draftsverif_db", async (req, res) => {
             let kl_llm0 = await fetch_klp2(
                     plid,
                     par1_tx,
-                    "meta-llama/Llama-4-Scout-17B-16E-Instruct",
-                )
-                .then((v) => {
+                    "meta-llama/Llama-4-Scout-17B-16E-Instruct", "Llama-3.1-8B",
+                ).then((v) => {
                     console.log("The result klp2 par1_tx========================");
-
                     console.log("what is r");
                     console.log(v);
-                })
-                .catch(console.error);
+                }).catch(console.error);
 
             let kl_llm1 = await fetch_klp2(
                     plid,
                     par2_tx,
-                    "mistralai/Mistral-Small-24B-Instruct-2501",
+                    "mistralai/Mistral-Small-24B-Instruct-2501", "Llama-4-Scout-17B",
                 )
                 .then((v) => {
                     console.log("The result klp2 par2_tx========================");
@@ -575,7 +587,7 @@ app.get("/draftsverif_db", async (req, res) => {
             let kl_llm2 = await fetch_klp2(
                     plid,
                     par3_tx,
-                    "klusterai/Meta-Llama-3.1-8B-Instruct-Turbo",
+                    "klusterai/Meta-Llama-3.1-8B-Instruct-Turbo", "Mistral-Small-24B",
                 )
                 .then((v) => {
                     console.log("The result klp2 par3_tx========================");
@@ -586,7 +598,9 @@ app.get("/draftsverif_db", async (req, res) => {
 
             console.log("======kl_llma=true =====");
             console.log(kl_llm0);
-        });
+                
+    });
+    
     } catch (error) {
         console.log("Error in  processing @ drafts_db @app.js ", error);
     }
@@ -595,14 +609,13 @@ app.get("/draftsverif_db", async (req, res) => {
 
 // verify drafts db
 app.get("/draftsverif_db2", async (req, res) => {
-    let user = null; 
+    let user = null;
 
+    const process_name = req.query.process_name;
     let chk_db_artcl = null;
     try {
         console.log("getDrafts ==========================");
-        const verifying = await getVerificDr2().then(async (vl) => {
-            // get variables
-
+        const verifying = await getVerificDr2({ process_name }).then(async (vl) => {
             let {
                 plid,
                 content,
@@ -611,12 +624,12 @@ app.get("/draftsverif_db2", async (req, res) => {
                 processor,
                 articleid
             } = vl[0];
-
+            let res = null;
             let index = null;
             let par3_tx = results_2.split(
                 "2025v New Circuit Model: klusterai/Meta-Llama-3.1-8B-Instruct-Turbo",
             )[1];
-            
+
             if (par3_tx.indexOf("Supporting Info :") > -1) {
                 let res = par3_tx.replace("Supporting Info :", "Info From Mistral: ");
                 par3_tx = res;
@@ -630,8 +643,16 @@ app.get("/draftsverif_db2", async (req, res) => {
                 "2025v New Circuit Model: mistralai/Mistral-Small-24B-Instruct-2501",
             )[1];
             index = scout.indexOf(
-                "2025v New Circuit Model: mistralai/Mistral-Small-24B-Instruct-2501",
+                "Llama-4-Scout-17B Supporting Info",
             );
+            if(scout.indexOf("Llama-4-Scout-17B Supporting Info") > -1 
+               && scout.indexOf("Mistral-Small-24B Supporting Info:") > -1){
+
+                // good 
+
+
+                
+            }
             let par2_tx = null;
             if (index !== -1) {
                 par2_tx = scout.slice(0, index); // Cut string from 0 to the occurrence of the substring
@@ -639,7 +660,7 @@ app.get("/draftsverif_db2", async (req, res) => {
 
                 console.log(par2_tx);
                 if (par2_tx.indexOf("Supporting Info :") > -1) {
-                    let res = par2_tx.replace("Supporting Info :", "Info From Llama-Scout: ");
+                    res = par2_tx.replace("Supporting Info :", "Info From Llama-Scout: ");
                     par2_tx = res;
                     console.log("----par2_text------");
                     console.log("----par2_text------");
@@ -648,7 +669,7 @@ app.get("/draftsverif_db2", async (req, res) => {
                 }
             }
 
-            
+
             let par1_tx = null;
 
             const trbo = results_2.split(
@@ -662,23 +683,9 @@ app.get("/draftsverif_db2", async (req, res) => {
                 console.log("substring substrung substring", par1_tx);
                 if (par1_tx.indexOf("Supporting Info :") > -1) {
                     let res = par1_tx.replace("Supporting Info :", "Info From Llama 8B: ");
-            
-            }
 
+                }
 
-
-
-
-
-
-
-
-
-
-                
-                
-                 
-                
                 par1_tx = res;
                 console.log("----par1_text------");
                 console.log("----par1_text------");
@@ -701,11 +708,15 @@ app.get("/draftsverif_db2", async (req, res) => {
             console.log("==============art_prgph");
             console.log(plid);
 
-               
+console.log("par b4 klp3 ++++++++");console.log("par b4 klp3 ++++++++");
+            console.log("par b4 klp3 ++++++++");
+console.log(plid," < PLID par_1==================", par1_tx); console.log(plid, " << PLID par_2===============", par2_tx); console.log(.//plid , " <<PLID par_3=============", par3_tx);
+/** 
+
             let kl_llm0 = await fetch_klp3(
                     plid,
                     par1_tx,
-                    "mistralai/Mistral-Small-24B-Instruct-2501","Llama-4-Scout-17B"
+                    "mistralai/Mistral-Small-24B-Instruct-2501", "Llama-4-Scout-17B", "Llama-3.1-8B",
                 )
                 .then((v) => {
                     console.log("The result klp2 par1_tx========================");
@@ -718,7 +729,7 @@ app.get("/draftsverif_db2", async (req, res) => {
             let kl_llm1 = await fetch_klp3(
                     plid,
                     par2_tx,
-                    "klusterai/Meta-Llama-3.1-8B-Instruct-Turbo","Mistral-Small-24B"
+                    "klusterai/Meta-Llama-3.1-8B-Instruct-Turbo", "Mistral-Small-24B", "Llama-4-Scout-17B"
                 )
                 .then((v) => {
                     console.log("The result klp2 par2_tx=========");
@@ -730,7 +741,7 @@ app.get("/draftsverif_db2", async (req, res) => {
             let kl_llm2 = await fetch_klp3(
                     plid,
                     par3_tx,
-                    "meta-llama/Llama-4-Scout-17B-16E-Instruct","Llama-3.1-8B",
+                    "meta-llama/Llama-4-Scout-17B-16E-Instruct", "Llama-3.1-8B", "Mistral-Small-24B",
                 )
                 .then((v) => {
                     console.log("The result klp2 par3_tx============");
@@ -738,15 +749,17 @@ app.get("/draftsverif_db2", async (req, res) => {
                     console.log(v);
                 })
                 .catch(console.error);
-
+*/
             console.log("======kl_llma=true =====");
-            console.log(kl_llm0);
+            // console.log(
+            
+            // kl_llm0);
         });
     } catch (error) {
         console.log("Error in  processing @ drafts_db @app.js ", error);
     }
 });
- 
+
 
 // 404 handler
 app.use((req, res) => {
