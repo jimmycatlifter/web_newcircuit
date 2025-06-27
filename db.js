@@ -56,20 +56,23 @@ const postArticle = async (postData) => {
       userid,
       draft_status,
       details,
-      descrip
+      descript,
+      nohtml_content,
   } = postData;
   console.log("post micro user @@ postArticle");
   console.log(content);
   console.log(userid);
 
   const query = `
-  INSERT INTO nc_articles(nc_subswriter, nc_content, nc_isdraft, nc_details_article, desciption, nc_date_created) 
-  VALUES ($1, $2, $3, $4, $5 NOW())
+  INSERT INTO nc_articles(nc_subswriter, nc_content, nc_isdraft, nc_details_article, nc_description, nc_date_created) 
+  VALUES ($1, $2, $3, $4, $5, NOW())
   RETURNING *
 `;
 
-  const values = [userid, content, draft_status, details, descrip];
+  const values = [userid, content, draft_status, details, descript];
 
+    
+    
   try {
       const result = await pool.query(query, values);
       console.log(" DB results Post Article ID THE ART ID= ");
@@ -88,8 +91,8 @@ const postArticle = async (postData) => {
         RETURNING *
      `;
 
-          const values = ["DRAFT_START", artid, processor];
-
+          const values = [ 'DRAFT_START', artid, processor];    
+          
           try {
               console.log("========insert nc logs========== ID here = ");
               console.log("========insert nc logs========== ID here = ");
@@ -98,12 +101,12 @@ const postArticle = async (postData) => {
               const plid = result.rows[0].id;
               if (result.rows.length > 0) {
                   const query = `
-            INSERT INTO nc_processed_content(content, plid, nc_date_created)
-            VALUES ($1, $2,  NOW())
-            RETURNING *
-        `;
+                    INSERT INTO nc_processed_content(content, plid,  nc_date_created)
+                    VALUES ($1, $2,  NOW())
+                    RETURNING *
+                `;
                   try {
-                      const result = await pool.query(query, [content, plid]);
+                      const result = await pool.query(query, [ nohtml_content, plid]);
                   } catch (error) {
                       console.log("Error in add process content after publishing");
                       console.log(error);
@@ -1054,6 +1057,31 @@ const getSearchedfriends = async (data) => {
 
 
 }
+const getDraftsRes3 = async () => {
+
+    const query = "Select nc.*, pl.* from nc_processed_content nc, nc_process_logs pl  where pl.id in (select pl.id where pl.status = 'DRAFT_FINAL' ORDER BY  pl.nc_date_created ASC limit 1) and pl.id= nc.plid;";
+
+      try {
+          const result = await pool.query(query);
+          console.log(" @get DRAFTS result.rows[0].results ");
+
+          if (result.rows.length > 0) {
+              console.log(result.rows[0].results_3);
+
+              return result.rows;
+          } else {
+              // return null;
+              // console.log("NONE 4 PROCESS", process_name);
+              throw new Error(`Nothing to process for this processor`);
+          }
+      } catch (error) {
+          console.log("error get drafts");
+          console.log(error);
+          throw new Error(`Nothing to process for this processor`);
+      }
+};
+
+    
 
 const getVerificDr2 = async (data) => {
 
@@ -1101,4 +1129,5 @@ module.exports = {
   getVerificDr2,
   pushVDraftsinfo,
   pushV2Draftsinfo,
+    getDraftsRes3,
 };
