@@ -20,6 +20,7 @@ const {
     getVerificDr,
     pushVDraftsinfo,
     getDraftsRes3,
+    getContentHtml,
 } = require("./db");
 
 const app = express();
@@ -34,13 +35,13 @@ async function fetch_kly1(idarticle, paragraph_art, modelname) {
     if (modelname.indexOf('Mistral') > -1) {
         model = "Mistral-Small-24B"
     }
-
     if (modelname.indexOf('Turbo') > -1) {
         model = "Llama-3.1-8B";
     }
     if (modelname.indexOf('Scout') > -1) {
         model = "Llama-4-Scout-17B";
     }
+
     const response = await fetch("https://api.kluster.ai/v1/chat/completions", {
             method: "POST",
             headers: {
@@ -383,106 +384,12 @@ app.get("/", (req, res) => {
 
 
 
-
-function extractWordsRecurringCollect(inputText, recurringText, endText) {
-    let coll = [];
-    let tx = null;
-
-    if (endText == "EndText-None") {
-        // tx = "Cited" + (inputText.split(recurringText)[i]).substring(0, (inputText.split(recurringText)[i]).indexOf(endText)  ) ;
-    } else {
-        console.log("@@@@@@@@ recur to collect =========", inputText.split(recurringText).length);
-        console.log("//////////////////////////");        
-        
-        console.log(inputText);
-        
-        
-        
-        console.log("//////////////////////////");
-
-        for (let i = 0; i < inputText.split(recurringText).length; i++) {
-
-            if ((inputText.split(recurringText)[i]).indexOf(endText) == -1) {
-
-console.log("tx==========================");
-                
-    console.log((inputText.split(recurringText)[i]));            
-    console.log("tx==========================");
-
-                tx = "Cited" + (inputText.split(recurringText)[i]) ;
-                if (tx.length < 40) {
-                    console.log("tx.length < 80");
-                    console.log("tx.length < 80");
-                    console.log("tx.length < 80");
-
-                    console.log(tx);
-                    console.log("end less 80 length ");
-                    console.log("end less 80 length ");
-                    console.log("end less 80 length >>> length = ", tx.length);
-
-                    continue;
-                }
-                console.log(tx);
-                coll.push(tx);
-
-
-
-
-
-                
-            } else {
-                tx = "Cited" + (inputText.split(recurringText)[i]).substring(0, (inputText.split(recurringText)[i]).indexOf(endText, 0));
-                if (tx.length < 40) {
-                    console.log("tx.length < 80");
-                    console.log("tx.length < 80");
-                    console.log("tx.length < 80");
-
-                    console.log(tx);
-                    console.log("end less 80 length ");
-                    console.log("end less 80 length ");
-                    console.log("end less 80 length >>> length = ", tx.length);
-
-                    continue;
-                }
-                console.log(tx);
-                coll.push(tx);
-            }
-
-        }
-
-        console.log("ARRAY ========================");
-
-
-
-
-        console.log(coll);
-
-
-
-
-        console.log("ARRAY ========================");
-
-
-    }
-
-
-    return coll;
-
-}
-
-// 
-
-
-
 app.get("/drafts_final", async(req, res) => {
 
-    const process_name = req.query.process_name;
-    let user = null;
-    if (!process_name) {
-        return res.status(400).json({
-            error: "Missing 'process name' query parameter"
-        });
-    }
+
+
+
+    
 
     try {
         console.log("getres 3 ==========================");
@@ -492,28 +399,117 @@ app.get("/drafts_final", async(req, res) => {
                 plid,
                 content,
                 id,
-                results_3,
-                processor,
+                results_3, 
                 articleid
             } = vl[0];
 
 
             console.log("Index of ??????????????? ", results_3.indexOf("2025v New Circuit Model: klusterai/Meta-Llama-3.1-8B-Instruct-Turbo"));
             console.log("Index of ??????????????? ", results_3.indexOf("------------------"));
-            results_3 = results_3.replace("2025v New Circuit Model: klusterai/Meta-Llama-3.1-8B-Instruct-Turbo", "");
-            results_3 = results_3.replace("2025v New Circuit Model: meta-llama/Llama-4-Scout-17B-16E-Instruct", "");
-            results_3 = results_3.replace("------------------", "");
-            results_3 = results_3.replace("2025v New Circuit Model: mistralai/Mistral-Small-24B-Instruct-2501", "");
+            results_3 = results_3.replaceAll("2025v New Circuit Model: klusterai/Meta-Llama-3.1-8B-Instruct-Turbo", "");
+            results_3 = results_3.replaceAll("2025v New Circuit Model: meta-llama/Llama-4-Scout-17B-16E-Instruct", "");
+            results_3 = results_3.replaceAll("------------------", "");
+            results_3 = results_3.replaceAll("2025v New Circuit Model: mistralai/Mistral-Small-24B-Instruct-2501", "");
 
 
 
             console.log("]]]]]]]]]]]]]]]]]]]]]");
-            console.log("]]]]]]]]]]]]]]]]]]]]]");
+            console.log("]]]]]]]]]]]]]]]]]]]]] ==  indexOf ----", results_3.indexOf("------------------"));
             console.log("]]]]]]]]]]]]]]]]]]]]]");
             console.log("]]]]]]]]]]]]]]]]]]]]]");
             console.log("]]]]]]]]]]]]]]]]]]]]]");
 
+            /** let results_ = results_3.replace("1. Cited", "Cited").replace("2. Cited", "Cited" ).replace("3. Cited", "Cited").replace("4. Cited", "Cited")    */
 
+
+
+
+
+            let results_ = results_3.replaceAll("1. Cited :", "Cited:");
+            results_ = results_.replaceAll("2. Cited :", "Cited:");
+            results_ = results_.replaceAll("3. Cited :", "Cited:");
+            results_ = results_.replaceAll("4. Cited :", "Cited:");
+            results_ = results_.replaceAll("1. Cited:", "Cited:");
+            results_ = results_.replaceAll("2. Cited:", "Cited:");
+            results_ = results_.replaceAll("3. Cited:", "Cited:");
+            results_ = results_.replaceAll("4. Cited:", "Cited:");
+
+            let cited_collectn = results_.split("Cited:");
+
+            console.log(results_.split("Cited:"));
+            console.log("++++++++++++++++++++++++++++++++");
+
+            try {
+                console.log("getres 3 ==========================");
+                const drafts = await getContentHtml({
+                    id: articleid
+                }).then(async(vl) => {
+
+                    if( vl == null  ){
+
+                        
+                    }else{
+
+                                            let {                       id, nc_isdraft,  nc_content              } = vl[0];
+                        console.log("==============Article==================================" , nc_isdraft , "======", nc_content );
+
+                        
+                    }
+                    
+                    /**
+
+                        let art_cont = {db vl};
+
+
+
+                        for (let i = 0; i < results_cln.length; i++) {
+                            if( (artcontent).indexOf(  )  ){
+
+                                //art_cont.indexOf( res_cllctn[i].substring( 0 ,res_cllctn[i].indexOf("Mistral") ) )
+                                //                  const nums = [90, 79, 101];
+
+
+                                let nums = [res_cllctn[i].indexOf("Mistral-Small-24B") , res_cllctn[i].indexOf("Llama-3.1-8B") , res_cllctn[i].indexOf("Llama-4-Scout-17B") ]; 
+                                const models = [
+                                  { llm_in: res_cllctn[i].indexOf("Mistral-Small-24B Supporting Info:") , model_name: "Mistral-Small-24B" },
+                                  { llm_in: res_cllctn[i].indexOf("Llama-3.1-8B Supporting Info:"), model_name: "Llama-3.1-8B" },
+                                  { llm_in: res_cllctn[i].indexOf("Llama-4-Scout-17B Supporting Info:"), model_name: "Llama-4-Scout-17B" }
+                                ];
+
+                                // Step 1: Get the least number
+                                const least = Math.min(...nums);
+
+                                // Step 2: Find the matching model object
+                                const matchedModel = models.find(model => model.llm_in === least);
+
+                                // Step 3: Output the model_name
+                                console.log(matchedModel.model_name);  // Output: "Trbo"
+
+                                let model_nearest = matchedModel.model_name;
+                                // find the citation from the db article  -- if found insert webinfo
+                                if( dbart.indexOf( citation_current ) ){
+
+
+                                } 
+
+
+                            }
+
+
+                        }
+
+
+                    **/
+
+                }).catch (error);
+
+                
+            } catch (error) {
+
+
+
+            }
+            /** 
             const cita1 = extractWordsRecurringCollect(results_3, "1. Cited", "2. Cited");
             const cita2 = extractWordsRecurringCollect(results_3, "2. Cited", "3. Cited");
             const cita3 = extractWordsRecurringCollect(results_3, "3. Cited", "4. Cited");
@@ -543,7 +539,7 @@ app.get("/drafts_final", async(req, res) => {
             console.log("len 3", cita3.length);
             console.log("len 4 ", cita4.length);
 
-
+**/
 
         });
     } catch (error) {
@@ -556,7 +552,12 @@ app.get("/drafts_final", async(req, res) => {
 app.get("/drafts_db", async(req, res) => {
 
     const process_name = req.query.process_name;
-    let user = null;
+
+    console.log("process_name    =====");    console.log("process_name    =====");
+console.log("process_name    =====");    console.log("process_name    =====", process_name);
+
+
+
     if (!process_name) {
         return res.status(400).json({
             error: "Missing 'process name' query parameter"
@@ -832,13 +833,12 @@ app.get("/draftsverif_db2", async(req, res) => {
 });
 
 
-// 404 handler
+// 404 Page handler
 app.use((req, res) => {
     res.status(404).render("404", {
         title: "Page Not Found"
     });
 });
-
 
 
 module.exports = app;
