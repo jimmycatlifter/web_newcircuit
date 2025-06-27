@@ -71,8 +71,8 @@ const postArticle = async (postData) => {
 
   const values = [userid, content, draft_status, details, descript];
 
-    
-    
+
+
   try {
       const result = await pool.query(query, values);
       console.log(" DB results Post Article ID THE ART ID= ");
@@ -92,7 +92,7 @@ const postArticle = async (postData) => {
      `;
 
           const values = [ 'DRAFT_START', artid, processor];    
-          
+
           try {
               console.log("========insert nc logs========== ID here = ");
               console.log("========insert nc logs========== ID here = ");
@@ -656,7 +656,7 @@ const getVerificDr = async (data) => {
 
   try {
       const result = await pool.query(query, [process_name]);
- 
+
       console.log(" @get DRAFTS result.rows[0].results ");
 
       if (result.rows.length > 0) {
@@ -668,7 +668,7 @@ const getVerificDr = async (data) => {
           console.log("NONE 4 PROCESS_A ");
           throw new Error(`Nothing to process for this processor`);
       }
-      
+
   } catch (error) {
       console.log("error get drafts");
       console.log(error);
@@ -911,22 +911,22 @@ const pushVDraftsinfo = async (data) => {
       console.log("index of turbo", prev.indexOf("Instruct-Turbo"));
       console.log("index of scout", prev.indexOf("Llama-4-Scout"));
       if(prev.indexOf("Llama-4-Scout") > -1 && prev.indexOf("Instruct-Turbo") > -1 && prev.indexOf("mistralai/Mistral") > -1){
-         
-           
+
+
               const query = `UPDATE nc_process_logs
                 SET status = $1 WHERE id = $2 and status = 'DRAFT_VERIFY'
                 RETURNING *
               `;
-            
+
               try {
                   const result = await pool.query(query, ["DRAFT_VERIFY_2", plid]);
                   console.log("@@ after update of status to draft_verify!");
                   console.log(result.rows[0]);
-                  
+
               } catch (error) {
                   console.log("Error in update of nc logs to DRAFT_VERIFY");
                   throw new Error(`Error during DRAFT_VERIFY_2 update`);
-                  
+
               }
         }
       // if process logs updated status and
@@ -1050,13 +1050,45 @@ const pushV2Draftsinfo = async (data) => {
 
       return "Error in updating processor many llm ";
   }
-};
+}
 
 
 const getSearchedfriends = async (data) => {
 
 
 }
+
+const getContentHtml = async (data) => {
+
+  let { id } = data;
+  const query = "UPDATE nc_articles SET nc_isdraft = 'DRAFT_INFO' WHERE id = $1 and nc_isdraft = 'DRAFT_START'   AND  $1 = ( SELECT id from nc_process_logs where status = 'DRAFT_FINAL' AND articleid = $1 )     RETURNING *";
+console.log("@@ getContentHtml =========id :" ,id );
+
+      try {
+
+          const result = await pool.query(query,[ id ]);
+          console.log(" @@@@get getContentHtml db  ");
+
+          if (result.rows.length > 0) {
+
+              console.log(result.rows[0].results_3);
+              return result.rows;       
+
+          }else{
+             return null; 
+          } 
+
+          
+      } catch (error) {
+
+          console.log(error);
+          throw new Error(`Error when processing for getContentHtml`);
+      }
+
+
+}
+
+
 const getDraftsRes3 = async () => {
 
     const query = "Select nc.*, pl.* from nc_processed_content nc, nc_process_logs pl  where pl.id in (select pl.id where pl.status = 'DRAFT_FINAL' ORDER BY  pl.nc_date_created ASC limit 1) and pl.id= nc.plid;";
@@ -1081,7 +1113,7 @@ const getDraftsRes3 = async () => {
       }
 };
 
-    
+
 
 const getVerificDr2 = async (data) => {
 
@@ -1130,4 +1162,5 @@ module.exports = {
   pushVDraftsinfo,
   pushV2Draftsinfo,
     getDraftsRes3,
+   getContentHtml,
 };
