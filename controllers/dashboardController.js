@@ -134,7 +134,7 @@ const post_publishercontent = async (req, res) => {
   // TODO : CHECK IF THE REQUEST IS FROM CREATOR
   let is_publisher;
 
-  const { content, title, descip } = req.body;
+  const { content, title, descript, image_article, category_article } = req.body;
   console.log("channel ", req.user_ischannel);
 
   console.log("fn!!!!!================!!!!!!!!!!");
@@ -145,10 +145,17 @@ const post_publishercontent = async (req, res) => {
 
   let userid = null;
   let categories = '{"tags": ["Lifestyle", "Street Children"]}';
+  const nohtml_content = content.replace(/<[^>]*>/g, '');
+  console.log("****************nohtml_content");  console.log(nohtml_content); // Output: Hello world!
+ // Output: Hello world!
 
+
+  console.log(typeof category_article );
   console.log("--------JSON.parse(categories)----------");
   console.log(JSON.parse(categories));
-
+  console.log("--------JSON.parse(artcile categories)----------");
+  console.log( {categories : category_article } );
+  
   let draft_status = "DRAFT_START";
 
   console.log(req.userfullname);
@@ -169,14 +176,16 @@ const post_publishercontent = async (req, res) => {
     console.log("email == @getUserByEmailDB ");
     userid = vl.id;
   });
-
+console.log("====================================== CONTENT -------");
+  console.log(content);
   try {
     const posting = await postArticle({
       content,
       userid,
+      nohtml_content,
       draft_status,
       details,
-      descrip,
+      descript,
     }).then((vl) => {
       console.log("postingblog");
       console.log("<== blogging");
